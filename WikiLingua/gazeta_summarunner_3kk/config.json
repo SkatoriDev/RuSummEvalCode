@@ -1,0 +1,74 @@
+{
+    "dataset_reader": {
+        "type": "gazeta_sentences_tagger_reader",
+        "lowercase": true,
+        "max_sentences_count": 50,
+        "sentence_max_tokens": 100,
+        "tokenizer": {
+            "type": "subword",
+            "model_path": "https://bpe-models.s3.eu-west-3.amazonaws.com/bpe_gazeta_5k.model"
+        }
+    },
+    "iterator": {
+        "type": "bucket",
+        "batch_size": 32,
+        "cache_instances": true,
+        "padding_noise": 0,
+        "sorting_keys": [
+            [
+                "source_sentences",
+                "num_fields"
+            ]
+        ]
+    },
+    "model": {
+        "type": "summarunner",
+        "dropout": 0.3,
+        "sentence_accumulator": {
+            "type": "lstm",
+            "bidirectional": true,
+            "hidden_size": 256,
+            "input_size": 512,
+            "num_layers": 1
+        },
+        "sentence_encoder": {
+            "type": "lstm",
+            "bidirectional": true,
+            "hidden_size": 256,
+            "input_size": 128,
+            "num_layers": 1
+        },
+        "source_embedder": {
+            "type": "basic",
+            "token_embedders": {
+                "tokens": {
+                    "type": "embedding",
+                    "embedding_dim": 128
+                }
+            }
+        },
+        "use_novelty": false,
+        "use_output_bias": false,
+        "use_pos_embedding": false,
+        "use_salience": false
+    },
+    "train_data_path": "/data/gazeta_train_oracle.txt",
+    "validation_data_path": "/data/gazeta_val_oracle.txt",
+    "trainer": {
+        "cuda_device": 0,
+        "grad_norm": 2,
+        "num_epochs": 10,
+        "optimizer": {
+            "type": "adam",
+            "lr": 0.001
+        },
+        "patience": 1,
+        "shuffle": true
+    },
+    "vocabulary": {
+        "max_vocab_size": 5000
+    },
+    "datasets_for_vocab_creation": [
+        "train"
+    ]
+}
